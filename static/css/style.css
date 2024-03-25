@@ -1,0 +1,30 @@
+#brandName {
+padding: 1.5rem;
+}
+.navbar-collapse {
+  justify-content: center;
+}
+.navbar-nav .nav-link {
+  margin-right: 1.5rem;
+}
+
+#basketBtn {
+background-color: #FF7F50;
+border-top-right-radius: 30%;
+border-bottom-left-radius: 30%;
+}
+.navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+      font-size: 1.1rem;
+      font-weight: bold;
+}
+
+    .carousel-item img {
+      max-width: 100%;
+      height: auto;
+      margin: auto;
+    }
