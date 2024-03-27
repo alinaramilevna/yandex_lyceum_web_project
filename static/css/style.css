@@ -29,3 +29,8 @@ border-bottom-left-radius: 30%;
       margin: auto;
     }
 
+form {
+    width: 50%;
+    margin: auto;
+}
+

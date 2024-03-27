@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from flask import Flask, render_template, redirect, make_response, request, session, abort
+from flask import Flask, render_template, redirect, make_response, request, session, abort, Blueprint, url_for
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import jsonify, make_response
@@ -12,6 +12,7 @@ from forms.login_form import LoginForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -26,15 +27,42 @@ def bad_request(_):
     return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
+def main():
+    db_session.global_init("db/database.db")
+    app.run(debug=True)
+
+
+@app.route('/new_position')
+@login_required
+def create_position():
+    if current_user.is_authenticated and current_user.status == "super":
+        return render_template('new_position.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/active_orders')
+@login_required
+def create_position():  # TODO: Сделать форму, нормальную загрузку фотографий
+    if current_user.is_authenticated and current_user.status == "super":
+        return render_template('active_orders.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/active_orders')
+@login_required
+def create_position():  # TODO: Сделать модель заказа
+    if current_user.is_authenticated and current_user.status == "super":
+        return render_template('active_orders.html')
+    else:
+        return redirect('/')
+
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
-
-
-def main():
-    db_session.global_init("db/database.db")
-    app.run(debug=True)
 
 
 @app.route('/login', methods=['GET', 'POST'])
