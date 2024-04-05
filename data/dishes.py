@@ -15,6 +15,8 @@ class Dish(SqlAlchemyBase):
     structure = sqlalchemy.Column(sqlalchemy.String)
     price = sqlalchemy.Column(sqlalchemy.Integer)
     type_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('types.id'))
+    image_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('images.id'))
+    image = orm.relationship('Image')
     type = orm.relationship('Type')
 
     def __repr__(self):

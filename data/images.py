@@ -4,10 +4,9 @@ from .db_session import SqlAlchemyBase
 from sqlalchemy import orm
 
 
-class Type(SqlAlchemyBase):
-    __tablename__ = 'types'
+class Image(SqlAlchemyBase):
+    __tablename__ = 'images'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
-    title = sqlalchemy.Column(sqlalchemy.String)
-    dishes = orm.relationship('Dish', back_populates='type')
+    path = sqlalchemy.Column(sqlalchemy.String)
