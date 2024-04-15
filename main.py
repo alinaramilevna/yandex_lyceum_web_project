@@ -2,7 +2,8 @@ import datetime
 import json
 import os
 
-from flask import Flask, render_template, redirect, make_response, request, session, abort, flash
+from flask import Flask, render_template, redirect, make_response, request, session, abort, flash, current_app
+from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -14,16 +15,17 @@ from data.users import User
 from data.tools import check_phone_number
 from data.dishes import Dish
 from data.types import Type
+from data.images import Image
 from forms.register_user import RegisterForm
 from forms.login_form import LoginForm
 from forms.new_position_form import PositionForm
 
-from data.consts import *
+from data.config import *
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-app.config['UPLOAD_FOLDER'] = 'upload/img'
+app.config['SECRET_KEY'] = SECRET_KEY
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -64,24 +66,50 @@ def create_position():
                         flash('Файл не выбран.')
                         return redirect(request.url)
                     if file and allowed_file(file.filename):
-                        pass  # TODO: Сделать загрузку фотографий на сервер, зацепить их во всех базах данных
+                        filename = str(datetime.datetime.now().date()) + '_' + str(
+                            datetime.datetime.now().time()).replace(':', '').replace('.', '') + '.' + \
+                                   file.filename.split('.')[1]
+                        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                        file.save(file_path)
 
-                    db_sess = db_session.create_session()
-                    dish = Dish()
-                    dish.title = form.title.data
-                    dish.description = form.description.data
-                    dish.weight = form.weight.data
-                    dish.price = form.price.data
-                    dish.structure = form.structure.data
-                    dish.type = db_sess.query(Type).filter(Type.id == int(form.type.data)).first()
-                    db_sess.add(dish)
-                    db_sess.commit()
+                        db_sess = db_session.create_session()
+                        dish = Dish()
+                        dish.title = form.title.data
+                        dish.description = form.description.data
+                        dish.weight = form.weight.data
+                        dish.price = form.price.data
+                        dish.structure = form.structure.data
+                        dish.type = db_sess.query(Type).filter(Type.id == int(form.type.data)).first()
+                        dish.image = Image(path=file_path)
+
+                        db_sess.add(dish)
+                        db_sess.commit()
                 except RequestEntityTooLarge:
                     flash('Загружаемый файл слишком большой.')
             return render_template('static_templates/order_added.html')
         return render_template('new_position.html', form=form)
     else:
         return redirect('/')
+
+
+@app.route('/items/<string:type>')
+def items_list(type):
+    db_sess = db_session.create_session()
+
+    types = {
+        'rolls': 'Роллы',
+        'pizza': 'Пицца',
+        'sets': 'Наборы',
+        'snacks': 'Салаты и закуски'
+    }
+    data = db_sess.query(Dish).join(Image, Image.id == Dish.image_id) \
+        .join(Type, Type.id == Dish.type_id) \
+        .filter(Type.title == types[type]) \
+        .options(joinedload(Dish.image)) \
+        .all()
+    if not data:
+        return render_template('static_templates/error_not_found.html')
+    return render_template('items_list.html', type=type, data=data)
 
 
 @app.route('/active_orders')
@@ -120,6 +148,10 @@ def index():
     # return redirect('/register')
     return render_template('index.html')
 
+
+@app.route('/basket')
+def basket():
+    pass
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

@@ -10,7 +10,7 @@ class PositionForm(FlaskForm):
     weight = IntegerField('Вес', validators=[DataRequired()])
     price = IntegerField('Стоимость', validators=[DataRequired()])
     structure = StringField('Состав', validators=[DataRequired()])
-    type = SelectField('Категория', choices=[(0, 'Роллы'), (1, 'Пицца'), (2, 'Наборы'), (3, 'Салаты и Закуски')])
+    type = SelectField('Категория', choices=[(1, 'Роллы'), (2, 'Пицца'), (3, 'Наборы'), (4, 'Салаты и Закуски')])
     image = FileField('Изображение', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Добавить позицию')
 
