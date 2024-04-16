@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask import jsonify, make_response
+from flask import jsonify, make_response, url_for
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from data import db_session
@@ -48,6 +48,17 @@ def bad_request(_):
 def main():
     db_session.global_init("db/database.db")
     app.run(debug=True)
+
+
+@app.route('/add-to-basket/<int:product_id>')
+def add_to_basket(product_id):
+    if 'basket' not in session:
+        session['basket'] = []
+
+    session['basket'].append(product_id)
+    session.modified = True
+    # print('OK')
+    return redirect(request.referrer or url_for('index'))
 
 
 @app.route('/new_position', methods=['GET', 'POST'])
@@ -151,7 +162,20 @@ def index():
 
 @app.route('/basket')
 def basket():
-    pass
+    data = []
+    if session['basket']:
+        s = set(session['basket'])
+        for item in s:
+            data.append({
+                'id': item,
+                'qnt': session['basket'].count(item)
+            })
+
+        db_sess = db_session.create_session()
+        get_position = db_sess.query(Dish).filter(Dish.id.in_(s))
+
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
