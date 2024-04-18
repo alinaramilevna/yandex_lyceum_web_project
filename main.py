@@ -4,7 +4,6 @@ import os
 
 from flask import Flask, render_template, redirect, make_response, request, session, abort, flash, current_app
 from sqlalchemy.orm import joinedload
-from werkzeug.utils import secure_filename
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import jsonify, make_response, url_for
@@ -61,6 +60,15 @@ def add_to_basket(product_id):
     return redirect(request.referrer or url_for('index'))
 
 
+@app.route('/delete-from-basket/<int:product_id>')
+def delete_from_basket(product_id):
+    for id in session['basket']:
+        if id == product_id:
+            session['basket'].remove(product_id)
+    session.modified = True
+    return render_template('basket.html' or 'index.html')
+
+
 @app.route('/new_position', methods=['GET', 'POST'])
 @login_required
 def create_position():
@@ -81,7 +89,7 @@ def create_position():
                             datetime.datetime.now().time()).replace(':', '').replace('.', '') + '.' + \
                                    file.filename.split('.')[1]
                         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-                        file.save(file_path)
+                        file.save('static/' + file_path)
 
                         db_sess = db_session.create_session()
                         dish = Dish()
@@ -118,6 +126,7 @@ def items_list(type):
         .filter(Type.title == types[type]) \
         .options(joinedload(Dish.image)) \
         .all()
+    # print(data)
     if not data:
         return render_template('static_templates/error_not_found.html')
     return render_template('items_list.html', type=type, data=data)
@@ -161,20 +170,27 @@ def index():
 
 
 @app.route('/basket')
-def basket():
+def basket():  # TODO: исправить html
     data = []
-    if session['basket']:
-        s = set(session['basket'])
-        for item in s:
+    if 'basket' in session:
+        basket_items = set(session['basket'])
+        for item in basket_items:
             data.append({
                 'id': item,
                 'qnt': session['basket'].count(item)
             })
 
         db_sess = db_session.create_session()
-        get_position = db_sess.query(Dish).filter(Dish.id.in_(s))
+        get_position = db_sess.query(Dish).filter(Dish.id.in_(basket_items))
 
-
+        # я не смогла придумать как передавать позиции в меню вместе с количеством на фронтенд, поэтому будем за квадрат делать
+        for i in range(len(data)):
+            for dish in get_position:
+                if data[i]['id'] == dish.id:
+                    data[i]['item'] = dish
+                    break
+    # print(data)
+    return render_template('basket.html', data=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])

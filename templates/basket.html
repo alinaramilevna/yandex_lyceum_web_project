@@ -1,14 +1,48 @@
 {% extends "base.html" %}
 
-<table class="table">
-    <tbody>
-    {% for item in data %}
-    <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% block content %}
+
+<style>
+    .table-container {
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .d-flex.justify-content-between.align-items-center {
+        padding-right: 15px;
+    }
+</style>
+
+
+<style>
+    .custom-gutter > [class*="col-"] {
+        padding-right: 15px; /* Добавляем отступ справа */
+        padding-left: 15px;  /* Добавляем отступ слева */
+    }
+</style>
+
+{% if not data %}
+<h3 align="center" style="margin: 10%;">Упс! Корзина пока-что пустует, но давайте заполним её чем-нибудь!</h3>
+{% else %}
+
+<div class="table-container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 gx-5">
+        <h3>Корзина</h3>
+        <small class="text-muted">Очистить корзину</small>
+    </div>
+
+    <table class="table">
+        <tbody>
+        {% for item in data %}
+        <tr>
+            <td><img class="img-thumbnail" src="{{url_for('static', filename=item['item'].image.path)}}"></td>
+            <td><b>{{ item['item'].title }}</b></td>
+            <td><strong>{{ item['item'].price }}</strong><br><small>{{ item['item'].weight }}</small></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

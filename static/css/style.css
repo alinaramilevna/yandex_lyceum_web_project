@@ -47,4 +47,8 @@ height: 832px;
 
 background: #FFFFFF;}
 
-
+.table {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
