@@ -2,26 +2,34 @@ import datetime
 import json
 import os
 
-from flask import Flask, render_template, redirect, make_response, request, session, abort, flash, current_app
+from flask import Flask, render_template, redirect, request, session, flash, current_app, jsonify, make_response, \
+    url_for
 from sqlalchemy.orm import joinedload
+from flask_restful import Api
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask import jsonify, make_response, url_for
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from data import db_session
+from api import dishes_resources
+
 from data.users import User
-from data.tools import check_phone_number
+from data.tools import check_phone_number, search_object, AddressError
 from data.dishes import Dish
 from data.types import Type
 from data.images import Image
+from data.orders import Order
+from data.order_details import Detail
+
 from forms.register_user import RegisterForm
 from forms.login_form import LoginForm
 from forms.new_position_form import PositionForm
+from forms.order_form import OrderForm
 
 from data.config import *
 
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -36,7 +44,7 @@ def allowed_file(filename):
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    return render_template('static_templates/error_not_found.html')
 
 
 @app.errorhandler(400)
@@ -46,7 +54,16 @@ def bad_request(_):
 
 def main():
     db_session.global_init("db/database.db")
+    api.add_resource(dishes_resources.DishResource, '/api/v1/dishes/<int:dish_id>')
+    api.add_resource(dishes_resources.DishesListResource, '/api/v1/dishes')
     app.run(debug=True)
+
+
+@app.route('/clear-basket')
+def clear_basket():
+    session['basket'] = []
+    session.modified = True
+    return redirect(request.referrer or url_for('index'))
 
 
 @app.route('/add-to-basket/<int:product_id>')
@@ -66,7 +83,7 @@ def delete_from_basket(product_id):
         if id == product_id:
             session['basket'].remove(product_id)
     session.modified = True
-    return render_template('basket.html' or 'index.html')
+    return redirect('/basket')
 
 
 @app.route('/new_position', methods=['GET', 'POST'])
@@ -132,6 +149,36 @@ def items_list(type):
     return render_template('items_list.html', type=type, data=data)
 
 
+@app.route('/registrate_order')
+def registrate_order():  # TODO: доделать
+    '''Регистрирует заказ и его детали (позиции меню) в бд'''
+    form = OrderForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        order = Order()
+
+        try:
+            address = search_object(form.address.data)
+        except AddressError:
+            return render_template('order_registration.html', error='Некорректный адрес')
+
+        total_amount = 0
+        for item in session['basket']:
+            total_amount += (item['item'].price * item['qnt'])
+
+        order.delivery_address = address
+        order.customer_id = current_user.id if current_user.is_authenticated else -1
+        order.datetime = datetime.datetime.now()
+        order.comment = form.type_of_paid.data
+        order.status = 0
+    total_amount = 0
+    print(session['basket_data'])
+    for item in session['basket_data']:
+        total_amount += (item['item'].price * item['qnt'])
+    print(total_amount)
+    return render_template('order_registration.html', form=form)
+
+
 @app.route('/active_orders')
 @login_required
 def active_orders():  # TODO: Сделать форму, нормальную загрузку фотографий
@@ -170,7 +217,7 @@ def index():
 
 
 @app.route('/basket')
-def basket():  # TODO: исправить html
+def basket():
     data = []
     if 'basket' in session:
         basket_items = set(session['basket'])
@@ -183,13 +230,13 @@ def basket():  # TODO: исправить html
         db_sess = db_session.create_session()
         get_position = db_sess.query(Dish).filter(Dish.id.in_(basket_items))
 
-        # я не смогла придумать как передавать позиции в меню вместе с количеством на фронтенд, поэтому будем за квадрат делать
+        # я не смогла придумать как передавать позиции в меню вместе с количеством на фронтенд, поэтому будем вот так грустно делать
         for i in range(len(data)):
             for dish in get_position:
                 if data[i]['id'] == dish.id:
                     data[i]['item'] = dish
                     break
-    # print(data)
+
     return render_template('basket.html', data=data)
 
 

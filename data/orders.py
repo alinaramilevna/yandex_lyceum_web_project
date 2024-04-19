@@ -13,7 +13,7 @@ class Order(SqlAlchemyBase):
     delivery_address = sqlalchemy.Column(sqlalchemy.String)
     total_amount = sqlalchemy.Column(sqlalchemy.Float)
     datetime = sqlalchemy.Column(sqlalchemy.DateTime)
-    comment = sqlalchemy.Column(sqlalchemy.String)
+    comment = sqlalchemy.Column(sqlalchemy.Integer)  # Тип оплаты, 0 - наличка, 1 - терминал (картой)
     status = sqlalchemy.Column(sqlalchemy.Integer)  # 0 - В работе, 1 - доставлен
     user = orm.relationship('User')
 

@@ -4,31 +4,25 @@
 
 <style>
     .table-container {
-        width: 50%;
+        width: 80%;
         margin-left: auto;
         margin-right: auto;
     }
     .d-flex.justify-content-between.align-items-center {
-        padding-right: 15px;
+        padding-right: 1%;
+        padding-left: 1%;
     }
 </style>
 
-
-<style>
-    .custom-gutter > [class*="col-"] {
-        padding-right: 15px; /* Добавляем отступ справа */
-        padding-left: 15px;  /* Добавляем отступ слева */
-    }
-</style>
 
 {% if not data %}
 <h3 align="center" style="margin: 10%;">Упс! Корзина пока-что пустует, но давайте заполним её чем-нибудь!</h3>
 {% else %}
 
 <div class="table-container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 gx-5">
+    <div class="d-flex justify-content-between align-items-center">
         <h3>Корзина</h3>
-        <small class="text-muted">Очистить корзину</small>
+        <div><small class="text-muted" onclick="location.href='/clear-basket'">Очистить корзину</small></div>
     </div>
 
     <table class="table">
@@ -37,11 +31,20 @@
         <tr>
             <td><img class="img-thumbnail" src="{{url_for('static', filename=item['item'].image.path)}}"></td>
             <td><b>{{ item['item'].title }}</b></td>
-            <td><strong>{{ item['item'].price }}</strong><br><small>{{ item['item'].weight }}</small></td>
+            <td><strong>{{ item['item'].price }}</strong><br><small>Количество: {{ item['qnt'] }}</small></td>
+            <td>
+                <button><img class="rounded mx-auto d-block" src="../static/img/trash.png"
+                             onclick="location.href='/delete-from-basket/{{ item.id }}'" style="height: 5%;"></button>
+            </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
+    <div style="display: flex; justify-content: center;">
+        <button type="button" class="btn btn-success" onclick="location.href='/registrate_order'">
+            Оформить заказ
+        </button>
+    </div>
 </div>
 {% endif %}
 
