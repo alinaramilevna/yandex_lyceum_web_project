@@ -4,6 +4,24 @@
 <div class="container mt-5">
     <h2>Оформление заказа</h2>
     <h3>{{ error }}</h3>
+    <table class="table">
+        <tbody>
+        {% for item in data %}
+        <tr>
+            <td><img class="img-thumbnail" src="{{url_for('static', filename=item.item.image.path)}}"></td>
+            <td><b>{{ item['item'].title }}</b></td>
+            <td><strong>{{ item['item'].price }}</strong><br><small>Количество: {{ item['qnt'] }}</small></td>
+
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>Общая сумма</td>
+            <td></td>
+            <td></td>
+            <td>{{ total_price }}</td>
+        </tr>
+        </tbody>
+    </table>
     <form method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">

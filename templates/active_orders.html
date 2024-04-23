@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="table-container">
+    <h3>Активные заказы</h3>
+
+    <table class="table">
+        <tbody>
+        {% for item in orders %}
+        <tr>
+            <td>{{ item.delivery_address }}</td>
+            <td>{{ item.status }}</td>
+        </tr>
+        <tr>
+            <td><b>{{ item['item'].title }}</b></td>
+            <td><strong>{{ item['item'].price }}</strong><br><small>Количество: {{ item['qnt'] }}</small></td>
+            <td>
+                <button><img class="rounded mx-auto d-block" src="../static/img/trash.png"
+                             onclick="location.href='/delete-from-basket/{{ item.id }}'" style="height: 5%;"></button>
+            </td>
+        </tr>
+        <tr>
+            <td>Общая сумма</td>
+            <td></td>
+            <td></td>
+            <td>{{ total_price }}</td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

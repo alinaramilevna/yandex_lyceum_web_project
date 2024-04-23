@@ -59,33 +59,6 @@ def main():
     app.run(debug=True)
 
 
-@app.route('/clear-basket')
-def clear_basket():
-    session['basket'] = []
-    session.modified = True
-    return redirect(request.referrer or url_for('index'))
-
-
-@app.route('/add-to-basket/<int:product_id>')
-def add_to_basket(product_id):
-    if 'basket' not in session:
-        session['basket'] = []
-
-    session['basket'].append(product_id)
-    session.modified = True
-    # print('OK')
-    return redirect(request.referrer or url_for('index'))
-
-
-@app.route('/delete-from-basket/<int:product_id>')
-def delete_from_basket(product_id):
-    for id in session['basket']:
-        if id == product_id:
-            session['basket'].remove(product_id)
-    session.modified = True
-    return redirect('/basket')
-
-
 @app.route('/new_position', methods=['GET', 'POST'])
 @login_required
 def create_position():
@@ -122,7 +95,7 @@ def create_position():
                         db_sess.commit()
                 except RequestEntityTooLarge:
                     flash('Загружаемый файл слишком большой.')
-            return render_template('static_templates/order_added.html')
+            return render_template('static_templates/item_added.html')
         return render_template('new_position.html', form=form)
     else:
         return redirect('/')
@@ -149,39 +122,110 @@ def items_list(type):
     return render_template('items_list.html', type=type, data=data)
 
 
-@app.route('/registrate_order')
-def registrate_order():  # TODO: доделать
-    '''Регистрирует заказ и его детали (позиции меню) в бд'''
-    form = OrderForm()
-    if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        order = Order()
+def get_item_from_cookies():
+    data = []
+    total_price = 0
+    if 'basket' in session:
+        basket_items = set(session['basket'])
+        for item in basket_items:
+            data.append({
+                'id': item,
+                'qnt': session['basket'].count(item)
+            })
 
+        db_sess = db_session.create_session()
+        get_position = db_sess.query(Dish).filter(Dish.id.in_(basket_items))
+
+        # я не смогла придумать как передавать позиции в меню вместе с количеством на фронтенд, поэтому будем вот так грустно делать
+        for i in range(len(data)):
+            for dish in get_position:
+                if data[i]['id'] == dish.id:
+                    data[i]['item'] = dish
+                    total_price += (data[i]['qnt'] * dish.price)
+                    break
+        session['total_price'] = total_price
+    return data, total_price
+
+
+@app.route('/basket')
+def basket():
+    data, total_price = get_item_from_cookies()
+    return render_template('basket.html', data=data, total_price=total_price)
+
+
+@app.route('/clear-basket')
+def clear_basket():
+    session['basket'] = []
+    session.modified = True
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/add-to-basket/<int:product_id>')
+def add_to_basket(product_id):
+    if 'basket' not in session:
+        session['basket'] = []
+
+    session['basket'].append(product_id)
+    session.modified = True
+    # print('OK')
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/delete-from-basket/<int:product_id>')
+def delete_from_basket(product_id):
+    for id in session['basket']:
+        if id == product_id:
+            session['basket'].remove(product_id)
+            break
+    session.modified = True
+    return redirect('/basket')
+
+
+@app.route('/registrate_order', methods=['GET', 'POST'])
+def registrate_order():
+    '''Create order and its details to the database'''
+    form = OrderForm()
+    data, total_price = get_item_from_cookies()
+    if form.validate_on_submit():
+
+        # check is correct address or not
         try:
             address = search_object(form.address.data)
         except AddressError:
             return render_template('order_registration.html', error='Некорректный адрес')
 
-        total_amount = 0
-        for item in session['basket']:
-            total_amount += (item['item'].price * item['qnt'])
+        # Create new order, then get its id and use it to create order details
+        db_sess = db_session.create_session()
+        order = Order(
+            delivery_address=address,
+            customer_id=current_user.id if current_user.is_authenticated else -1,
+            datetime=datetime.datetime.now(),
+            comment=form.type_of_paid.data,
+            status=0,
+            total_amount=total_price
+        )
 
-        order.delivery_address = address
-        order.customer_id = current_user.id if current_user.is_authenticated else -1
-        order.datetime = datetime.datetime.now()
-        order.comment = form.type_of_paid.data
-        order.status = 0
-    total_amount = 0
-    print(session['basket_data'])
-    for item in session['basket_data']:
-        total_amount += (item['item'].price * item['qnt'])
-    print(total_amount)
-    return render_template('order_registration.html', form=form)
+        db_sess.add(order)
+        db_sess.commit()
+
+        id_order = order.id
+        db_sess = db_session.create_session()
+        for item in data:
+            order_detail = Detail(
+                order_id=id_order,
+                item_id=item['item'].id,
+                quantity=item['qnt']
+            )
+            db_sess.add(order_detail)
+            db_sess.commit()
+        session.clear()
+        return render_template('order_created.html')
+    return render_template('order_registration.html', form=form, data=data, total_price=total_price)
 
 
 @app.route('/active_orders')
 @login_required
-def active_orders():  # TODO: Сделать форму, нормальную загрузку фотографий
+def active_orders():  # TODO: Сделать форму
     if current_user.is_authenticated and current_user.status == "super":
         return render_template('active_orders.html')
     else:
@@ -214,30 +258,6 @@ def login():
 def index():
     # return redirect('/register')
     return render_template('index.html')
-
-
-@app.route('/basket')
-def basket():
-    data = []
-    if 'basket' in session:
-        basket_items = set(session['basket'])
-        for item in basket_items:
-            data.append({
-                'id': item,
-                'qnt': session['basket'].count(item)
-            })
-
-        db_sess = db_session.create_session()
-        get_position = db_sess.query(Dish).filter(Dish.id.in_(basket_items))
-
-        # я не смогла придумать как передавать позиции в меню вместе с количеством на фронтенд, поэтому будем вот так грустно делать
-        for i in range(len(data)):
-            for dish in get_position:
-                if data[i]['id'] == dish.id:
-                    data[i]['item'] = dish
-                    break
-
-    return render_template('basket.html', data=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])
