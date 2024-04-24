@@ -1,0 +1,49 @@
+# https://zellwk.com/blog/github-actions-deploy/
+# 1. Cоздаём ключ на сервере - github_key
+# > ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+# 2. Прописываем его в authorized_keys
+# > cat github_key.pub >> authorized_keys
+# 3. Копируем закрытый ключ
+# > cat ~/.ssh/github_key
+# Результат в Github secrets -> key
+# 4. Добавляем инфу в сикретс
+#
+# SSH CONNECT
+# в Github secrets -> host - ip dev сервера
+# в Github secrets -> username - Пользователь из под которого создавали ключ на сервере
+#
+# DEPLOY SETTINGS
+# в Github secrets -> project_name - Название проекта типа "project_name" https://github.com/mr-Abdrahimov/project_name/
+# в Github secrets -> project_path - ссылка до проекта "/var/www/yandex_lyceum_web_project"
+#
+# TG SETTINGS
+# в Github secrets -> tg_token - Токен телеграм бота 5224911424:AAEf6gZdd0je19B3125z3HZnozv7ItX2arg
+# в Github secrets -> tg_chat_id - Токен телеграм бота 36756123 | -102312309123
+#
+# в Github secrets должно быть 6 записей key, host, username, project_path, project_name, tg_token, tg_chat_id
+
+name: Deploy server
+
+on:
+  push:
+    branches: [ prod ]
+  pull_request:
+    branches: [ prod ]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.key }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.host }} >> ~/.ssh/known_hosts
+
+      - name: Start deploy.sh on DEV server
+        run: ssh ${{ secrets.username }}@${{ secrets.host }} 'cd /var/www/yandex_lyceum_web_project/ && sh deploy.sh'
