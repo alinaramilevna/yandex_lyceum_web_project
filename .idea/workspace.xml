@@ -5,18 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="56b12e88-fa8e-4674-8ec4-744cd2b87e4f" name="Changes" comment="ка пэц">
-      <change afterPath="$PROJECT_DIR$/api/dish_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/dishes_resources.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/forms/order_form.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/trash.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/order_registration.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/dishes.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/dishes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/orders.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/basket.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/basket.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,17 +41,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Python.dish_api_test.executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/Users/user/PycharmProjects/real_web_project/static/img"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.dish_api_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/user/PycharmProjects/real_web_project/static/img&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/static/img" />
@@ -74,7 +64,7 @@
       <recent name="$PROJECT_DIR$/forms/main_forms" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager">
     <configuration name="dish_api_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="real_web_project" />
       <option name="ENV_FILES" value="" />
@@ -119,11 +109,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.dish_api_test" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>

@@ -56,7 +56,7 @@ def main():
     db_session.global_init("db/database.db")
     api.add_resource(dishes_resources.DishResource, '/api/v1/dishes/<int:dish_id>')
     api.add_resource(dishes_resources.DishesListResource, '/api/v1/dishes')
-    app.run(debug=True)
+    app.run(debug=True, port=4050)
 
 
 @app.route('/new_position', methods=['GET', 'POST'])
