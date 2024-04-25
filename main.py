@@ -29,6 +29,7 @@ from forms.new_position_form import PositionForm
 from forms.order_form import OrderForm
 
 from data.config import *
+from data.mail_sender import send_email
 
 app = Flask(__name__)
 api = Api(app)
@@ -233,15 +234,30 @@ def registrate_order():
 
         id_order = order.id
         db_sess = db_session.create_session()
+        data_to_send = []
         for item in data:
             order_detail = Detail(
                 order_id=id_order,
                 item_id=item['item'].id,
                 quantity=item['qnt']
             )
+            data_to_send.append((item['item'].title, item['qnt']))
             db_sess.add(order_detail)
             db_sess.commit()
+
+        menu_position = []
+        for item in data_to_send:
+            menu_position.append(' '.join([str(i) for i in item]))
+        text = f'''
+        Ваш заказ #{order.id}
+        Адрес доставки: {address},
+        Время заказа: {datetime.datetime.now()},
+        Позиции меню: {'\n'.join(menu_position)}
+                    '''
+        subject = 'Заказ зарегистрирован'
+        send_email(form.email.data, subject, text)
         session.clear()
+
         return render_template('static_templates/order_created.html')
     return render_template('order_registration.html', form=form, data=data, total_price=total_price)
 

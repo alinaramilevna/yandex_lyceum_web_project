@@ -17,8 +17,10 @@ def send_email(email, subject, text, attachments=None):
     body = text
     msg.attach(MIMEText(body, 'plain'))
 
-    server = smtplib.SMTP_SSL(os.getenv('HOST'), os.getenv('PORT'))
+    server = smtplib.SMTP(os.getenv('HOST'), os.getenv('PORT'))
+    server.starttls()
     server.login(addr_from, password)
-    server.send_message(msg)
+    text = msg.as_string()
+    server.sendmail(msg['From'], msg['To'], text)
     server.quit()
     return True
