@@ -6,8 +6,8 @@ from email.mime.text import MIMEText
 
 
 def send_email(email, subject, text, attachments=None):
-    addr_from = os.getenv('FROM')
-    password = os.getenv('PASSWORD')
+    addr_from = os.getenv('EMAIL_FROM')
+    password = os.getenv('EMAIL_PASSWORD')
 
     msg = MIMEMultipart()
     msg['From'] = addr_from
@@ -17,7 +17,7 @@ def send_email(email, subject, text, attachments=None):
     body = text
     msg.attach(MIMEText(body, 'plain'))
 
-    server = smtplib.SMTP(os.getenv('HOST'), os.getenv('PORT'))
+    server = smtplib.SMTP(os.getenv('SMTP_HOST'), os.getenv('SMTP_PORT'))
     server.starttls()
     server.login(addr_from, password)
     text = msg.as_string()
