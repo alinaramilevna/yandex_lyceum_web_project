@@ -247,13 +247,8 @@ def registrate_order():
 
         menu_position = []
         for item in data_to_send:
-            menu_position.append(' '.join([str(i) for i in item]))
-        text = f'''
-        Ваш заказ #{order.id}
-        Адрес доставки: {address},
-        Время заказа: {datetime.datetime.now()},
-        Позиции меню: {'\n'.join(menu_position)}
-                    '''
+            menu_position.append(' - '.join([str(i) for i in item]))
+        text = f'Ваш заказ #{order.id}\nАдрес доставки: {address},\nВремя заказа: {datetime.datetime.now()},\n Позиции меню: {'\n'.join(menu_position)}'
         subject = 'Заказ зарегистрирован'
         send_email(form.email.data, subject, text)
         session.clear()
