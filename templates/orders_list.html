@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Активные заказы</h2>
+    {% for item in data %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>{{ item.order.delivery_address }}</th>
+                        <th>{{ item.order.status.title }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in item.details %}
+                    <tr>
+                        <td>{{ product.item.title }}</td>
+                        <td>x{{ product.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-info">
+                        <td>Всего:</td>
+                        <td>{{ item.order.total_amount }}</td>
+                    </tr>
+                    <tr class="table-info">
+                        <td>Номер телефона:</td>
+                        <td>{{ item.order.user.phone_number }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="display: flex; justify-content: center;">
+                    <!-- Форма для изменения статуса заказа -->
+                    <form action="{{ url_for('change_order_status') }}" method="post">
+                        <div class="form-group">
+                            <label for="statusSelect{{ item.order.id }}">Статус заказа:</label>
+                            <select class="form-control" id="statusSelect{{ item.order.id }}" name="new_status">
+                                <!-- Предположим, что у вас есть список возможных статусов в переменной statuses -->
+                                {% for status in statuses %}
+                                <option value="{{ status.id }}" {% if status.id== item.order.status_id %}selected{%
+                                        endif %}>
+                                    {{ status.title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="hidden" name="order_id" value="{{ item.order.id }}">
+                        <button type="submit" class="btn btn-primary">Изменить статус</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

@@ -2,10 +2,6 @@ import requests
 from data.config import YANDEX_SEARCH_MAPS_APIKEY
 
 
-
-class AddressError(Exception):
-    pass
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 def check_phone_number(phone_number: str):
@@ -69,6 +65,6 @@ def search_object(object):
     # print(toponym)
     if toponym:
         return get_address(toponym)
-    raise AddressError
+    raise IndexError
 
 # ----------------------------------------------------------------------------------------------------------------------

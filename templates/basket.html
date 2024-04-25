@@ -29,7 +29,7 @@
         <tbody>
         {% for item in data %}
         <tr>
-            <td><img class="img-thumbnail" src="{{url_for('static', filename=item['item'].image.path)}}"></td>
+            <td><img class="img-thumbnail" src="{{url_for('static', filename=item.item.image.path)}}"></td>
             <td><b>{{ item['item'].title }}</b></td>
             <td><strong>{{ item['item'].price }}</strong><br><small>Количество: {{ item['qnt'] }}</small></td>
             <td>
@@ -47,7 +47,7 @@
         </tbody>
     </table>
     <div style="display: flex; justify-content: center;">
-        <button type="button" class="btn btn-success" onclick="location.href='/registrate_order'">
+        <button type="button" class="btn btn-success" onclick="location.href='/registrate-order'">
             Оформить заказ
         </button>
     </div>

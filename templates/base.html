@@ -71,9 +71,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/items/snacks">Салаты и закуски</a>
                 </li>
+                {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                        <a class="nav-link" href="#">Мой текущий заказ</a>
-                    </li>
+                    <a class="nav-link" href="#">Мой текущий заказ</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
@@ -83,13 +85,13 @@
             <div class="collapse navbar-collapse flex-column flex-lg-row" id="superNavbar">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Активные заказы</a>
+                        <a class="nav-link" href="/active-orders">Активные заказы</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">История</a>
+                        <a class="nav-link" href="/history-orders">История</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/new_position">Добавить позицию</a>
+                        <a class="nav-link" href="/new-position">Добавить позицию</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Новый заказ</a>

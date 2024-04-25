@@ -12,4 +12,5 @@ class Detail(SqlAlchemyBase):
     order_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('orders.id'))
     item_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('dishes.id'))
     quantity = sqlalchemy.Column(sqlalchemy.Integer)
+    item = orm.relationship('Dish')
     order = orm.relationship('Order')
