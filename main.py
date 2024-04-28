@@ -285,7 +285,7 @@ def get_orders(html: str, *args):
             orders = db_sess.query(Order).filter(Order.status_id.in_(args)).all()
         # BullshitCode ON
         data = []
-        # create dictionary with orders and its details
+        # create dictionary with orders and its detailsz
         for order in orders:
             details = db_sess.query(Detail).filter(Detail.order_id == order.id).all()
             data.append({
