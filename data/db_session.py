@@ -18,6 +18,7 @@ def global_init(db_file):
         raise Exception("Необходимо указать файл базы данных.")
 
     conn_str = f'sqlite:///{db_file.strip()}?check_same_thread=False'
+    # я передумала на mysql делать
 
     print(f"Подключение к базе данных по адресу {conn_str}")
 
