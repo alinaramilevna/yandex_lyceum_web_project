@@ -377,6 +377,25 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
+@app.route('/my-orders')
+@login_required
+def check_my_orders():
+    if current_user.is_authenticated:
+        db_sess = db_session.create_session()
+        data = []
+        orders = db_sess.query(Order).filter(Order.user == current_user).all()[::-1]
+
+        for item in orders:
+            data.append({
+                'order': item,
+                'details': db_sess.query(Detail).filter(Detail.order_id == item.id).all()
+            })
+
+        return render_template('my_orders.html', data=data)
+    else:
+        return redirect('/')
+
+
 @app.route('/logout')
 @login_required
 def logout():

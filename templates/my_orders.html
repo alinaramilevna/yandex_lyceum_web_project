@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if not data %}
+<h2 align="center" style="margin: 10%;">Упс! У вас пока нет активных заказов, но давайте исправим это!</h2>
+{% else %}
+
+<div class="container mt-5">
+    <h2>Мои заказы</h2>
+    {% for item in data %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>{{ item.order.delivery_address }}</th>
+                        <th>{{ item.order.status.title }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in item.details %}
+                    <tr>
+                        <td><img src="{{url_for('static', filename=product.item.image.path) }}" class="card-img-top">
+                        </td>
+                        <td>{{ product.item.title }}</td>
+                        <td>x{{ product.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-info">
+                        <td>Всего:</td>
+                        <td>{{ item.order.total_amount }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endif %}
+
+{% endblock %}
