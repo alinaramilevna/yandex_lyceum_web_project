@@ -81,6 +81,7 @@ def create_base_data_if_not_exist():
         s = Status(title=status)
         db_sess.add(s)
     db_sess.commit()
+    db_sess.close()
 
 
 @app.route('/new-position', methods=['GET', 'POST'])
@@ -117,6 +118,7 @@ def create_position():
                         )
                         db_sess.add(dish)
                         db_sess.commit()
+                        db_sess.close()
                     elif not allowed_file(file.filename):
                         flash('Некорректное расширение файла.')
                 except RequestEntityTooLarge:
@@ -135,6 +137,7 @@ def items_list(type):
         .filter(Type.title == type) \
         .options(joinedload(Dish.image)) \
         .all()
+    db_sess.close()
     # print(data)
     if not data:
         return render_template('static_templates/error_not_found.html')
@@ -142,21 +145,20 @@ def items_list(type):
 
 
 def get_item_from_cookies():
-    db_sess = db_session.create_session()
     data = []
     total_price = 0
     if 'basket' in session:
         basket_items = set(session['basket'])
         # print(basket_items)
+        db_sess = db_session.create_session()
         for item in basket_items:
             data.append({
                 'id': item,
                 'qnt': session['basket'].count(item),
                 'item': db_sess.query(Dish).filter(Dish.id == item).first()
             })
-
-        db_sess = db_session.create_session()
         get_position = db_sess.query(Dish).filter(Dish.id.in_(basket_items))
+        db_sess.close()
 
         # i could not figure out how to transmit position in item list with its quantity to the frontend, so
         # i have to do it so sad
@@ -169,12 +171,12 @@ def get_item_from_cookies():
         session['total_price'] = total_price
         # print(total_price)
     # print(data)
-    return data, total_price
+    return data, total_price, db_sess.close()
 
 
 @app.route('/basket')
 def basket():
-    data, total_price = get_item_from_cookies()
+    data, total_price, _ = get_item_from_cookies()
     return render_template('basket.html', data=data, total_price=total_price)
 
 
@@ -210,7 +212,7 @@ def delete_from_basket(product_id):
 def registrate_order():
     '''Create order and its details to the database'''
     form = OrderForm()
-    data, total_price = get_item_from_cookies()
+    data, total_price, _ = get_item_from_cookies()
     if form.validate_on_submit():
 
         # check is correct address or not
@@ -232,6 +234,7 @@ def registrate_order():
 
         db_sess.add(order)
         db_sess.commit()
+        db_sess.close()
 
         id_order = order.id
         db_sess = db_session.create_session()
@@ -245,6 +248,7 @@ def registrate_order():
             data_to_send.append((item['item'].title, item['qnt']))
             db_sess.add(order_detail)
             db_sess.commit()
+        db_sess.close()
 
         menu_position = []
         for item in data_to_send:
@@ -252,7 +256,8 @@ def registrate_order():
         text = f"Ваш заказ #{order.id}nАдрес доставки: {address},nВремя заказа: {datetime.datetime.now()},n Позиции меню: {'n'.join(menu_position)}"
         subject = 'Заказ зарегистрирован'
         send_email(form.email.data, subject, text)
-        session.clear()
+        session['basket'] = []
+        session.modified = True
 
         return render_template('static_templates/order_created.html')
     return render_template('order_registration.html', form=form, data=data, total_price=total_price)
@@ -264,14 +269,14 @@ def change_order_status():
     if current_user.is_authenticated and current_user.status == "super":
         order_id = request.form.get('order_id')
         new_status_id = request.form.get('new_status')
+        db_sess = db_session.create_session()
         if order_id and new_status_id:
-            db_sess = db_session.create_session()
             order = db_sess.query(Order).get(order_id)
             if order:
                 order.status_id = new_status_id
                 db_sess.commit()
                 flash('Статус заказа успешно обновлен.', 'success')
-        return redirect('orders_list.html')
+        return redirect('orders_list.html'), db_sess.close()
 
     else:
         return render_template('index.html')
@@ -294,9 +299,8 @@ def get_orders(html: str, *args):
                 'details': details
             })
         # BullshitCode OFF
-
         statuses = db_sess.query(Status).all()
-        return render_template(html, data=data, statuses=statuses)
+        return render_template(html, data=data, statuses=statuses), db_sess.close()
     else:
         return redirect('/')
 
@@ -316,7 +320,9 @@ def history_orders():
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+    res = db_sess.query(User).get(user_id)
+    db_sess.close()
+    return res
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -325,6 +331,7 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.phone_number == check_phone_number(form.phone_number.data)).first()
+        db_sess.close()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -374,6 +381,7 @@ def register():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
+        db_sess.close()
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
@@ -385,6 +393,7 @@ def check_my_orders():
         db_sess = db_session.create_session()
         data = []
         orders = db_sess.query(Order).filter(Order.user == current_user).all()[::-1]
+        db_sess.close()
 
         for item in orders:
             data.append({
