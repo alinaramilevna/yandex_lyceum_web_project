@@ -18,33 +18,28 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
-<header class="header" id="mainHeader">
-    <nav class="navbar navbar-expand-md navbar-light bg-light" id="mainNavbar">
-        <a class="navbar-brand" href="/" id="brandName" style="margin: 1.5rem;">Yandex.Rolls</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+<header class="header">
+    <nav class="main-navbar">
+        <a class="navbar-title" href="/">Yandex.Rolls</a>
+        <div>
+            <ul class="navbar login-navbar">
                 {% if not current_user.is_authenticated %}
                 <a href="/login">
-                    <li class="nav-item">
-                        <button type="button" class="btn me-5">Вход</button>
+                    <li class="login-item">
+                        <button class="btn login-button">Вход</button>
                     </li>
                 </a>
-                <li class="nav-item">
+                <li class="login-item">
                     <a href="/register">
-                        <button type="button" class="btn me-5">
+                        <button class="btn login-button">
                             Регистрация
                         </button>
                     </a>
                 </li>
                 {% else %}
-                <li class="nav-item">
-                    <a href="/logout" id="logoutBtn">
-                        <button type="button" class="btn mb-2 me-5">
+                <li class="login-item">
+                    <a href="/logout">
+                        <button type="button" class="">
                             Выйти
                         </button>
                     </a>
@@ -52,11 +47,11 @@
                 {% endif %}
             </ul>
         </div>
-        <button type="button" class="btn mb-2 me-5" id="basketBtn" onclick="location.href='/basket'">Перейти в
-            корзину</a></button>
+        <button class="btn" onclick="location.href='/basket'">Перейти в
+            корзину</button>
         <br>
     </nav>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light product-navbar">
         <div class="collapse navbar-collapse flex-column flex-lg-row" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">

@@ -171,7 +171,7 @@ def get_item_from_cookies():
         session['total_price'] = total_price
         # print(total_price)
     # print(data)
-    return data, total_price, db_sess.close()
+    return data, total_price, 1
 
 
 @app.route('/basket')
@@ -393,7 +393,6 @@ def check_my_orders():
         db_sess = db_session.create_session()
         data = []
         orders = db_sess.query(Order).filter(Order.user == current_user).all()[::-1]
-        db_sess.close()
 
         for item in orders:
             data.append({
@@ -401,7 +400,7 @@ def check_my_orders():
                 'details': db_sess.query(Detail).filter(Detail.order_id == item.id).all()
             })
 
-        return render_template('my_orders.html', data=data)
+        return render_template('my_orders.html', data=data), db_sess.close()
     else:
         return redirect('/')
 
