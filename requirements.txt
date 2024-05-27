@@ -4,7 +4,8 @@ SQLAlchemy~=2.0.29
 Werkzeug~=3.0.1
 WTForms~=3.1.2
 python-dotenv~=1.0.1
-dotenv
+python-dotenv
 flask-restful
-pymysql
-aiomysql
+flask-wtf
+flask-login
+sqlalchemy-serializer

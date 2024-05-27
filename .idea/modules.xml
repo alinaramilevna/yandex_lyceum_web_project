@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../infbez/.idea/infbez.iml" filepath="$PROJECT_DIR$/../infbez/.idea/infbez.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/real_web_project.iml" filepath="$PROJECT_DIR$/.idea/real_web_project.iml" />
     </modules>
   </component>

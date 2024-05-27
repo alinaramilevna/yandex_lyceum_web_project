@@ -1,6 +1,11 @@
-#brandName {
-padding: 1.5rem;
+body {
+margin: 0;
+font-family: Arial, Helvetica, sans-serif;
+background-image: url('../img/navbar.png');
+background-repeat: no-repeat;
+background-size: 100% 200px;
 }
+
 .navbar-collapse {
   justify-content: center;
 }
@@ -8,11 +13,6 @@ padding: 1.5rem;
   margin-right: 1.5rem;
 }
 
-#basketBtn {
-background-color: #FF7F50;
-border-top-right-radius: 30%;
-border-bottom-left-radius: 30%;
-}
 .navbar-brand {
       font-size: 1.5rem;
       font-weight: bold;
@@ -23,7 +23,7 @@ border-bottom-left-radius: 30%;
       font-weight: bold;
 }
 
-    .carousel-item img {
+.carousel-item img {
       max-width: 100%;
       height: auto;
       margin: auto;
@@ -34,21 +34,85 @@ form {
     margin: auto;
 }
 
-#product {display: flex;
-flex-direction: row;
-align-items: flex-start;
-padding: 157px 80px;
-gap: 10px;
-isolation: isolate;
+.product {
+margin: 0;
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+padding: 30px;
+gap: 5rem;
 
 position: relative;
-width: 1280px;
-height: 832px;
-
-background: #FFFFFF;}
+}
 
 .table {
     width: 50%;
     margin-left: auto;
     margin-right: auto;
 }
+
+.btn {
+    border: 0;
+    background-color: #D2691E;
+    cursor: grab;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.main-navbar {
+    margin:0;
+    /*background-color: #CD853F;*/
+    display: flex;
+    justify-content: space-between;
+
+}
+
+header {
+    display: grid;
+    padding: 30px;
+}
+
+.navbar-btn {
+    border: 0;
+    background-color: #DA70D6;
+    cursor: grab;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.login-item {
+    display: grid;
+    row-gap: 50px;
+    text-decoration: none;
+}
+
+.login-button {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    display: flex;
+    gap: 50px;
+    text-decoration: none;
+}
+
+.navbar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #000;
+    padding: 1.5rem;
+}
+
+.navbar-title:hover {
+    color: #DA70D6;
+    text-decoration: none;
+}
+
+.product-navbar{
+    margin:0;
+    /*background-color: #F4A460 !important;*/
+    display: flex;
+    justify-content: space-between;
+}
+
+
